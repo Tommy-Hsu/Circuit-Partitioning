@@ -9,11 +9,12 @@ TARGET = Lab1
 
 all: $(TARGET) test
 
-$(TARGET): main.cpp
-	$(CXX) $(CXXFLAGS) main.cpp -o $(TARGET)
+$(TARGET): main.cpp src/fm.cpp src/fm.h
+	$(CXX) $(CXXFLAGS) main.cpp src/fm.cpp -o $(TARGET)
 
 test: $(TARGET)
-	./$(TARGET) input.txt output.txt
+	./$(TARGET) input.dat output.dat
 
 clean:
 	rm -f $(TARGET)
+
