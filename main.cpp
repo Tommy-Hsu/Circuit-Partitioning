@@ -15,8 +15,10 @@ int main(int argc, char* argv[]){
 
     FiducciaMattheyses_Heuristic fm;
     fm.Parse_input(input);
-    // fm.Print_NC_Table();
-    // fm.Print_CN_Table();
+    fm.GetNetList();
+    fm.GetCellList();
+    fm.Initialization();
+    fm.Print_CutSize_Result();
 
     return 0;   
 }

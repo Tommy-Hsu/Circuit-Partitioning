@@ -5,3 +5,9 @@ Lab1
 *.dat
 
 /.vscode
+
+*.zip
+
+/SolutionChecker
+
+*.out
