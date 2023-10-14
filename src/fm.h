@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include "Data.h"
+#include "BucketList.h"
 
 class FiducciaMattheyses_Heuristic{
     private:
@@ -21,6 +22,9 @@ class FiducciaMattheyses_Heuristic{
         int                             n_id, c_id;
         int                             n_number, c_number;
         int                             g1_size, g2_size;
+        int                             max_pin;
+        int                             cut_size;
+        BucketList                      bucket_list_g1, bucket_list_g2;
 
     public:
         // constructor and destructor
@@ -35,14 +39,18 @@ class FiducciaMattheyses_Heuristic{
         };
 
         // functions
-        int getCutSize();
         Cell* getOrCreateCell(int c_id);
+        int   getPinNum();
+        int   F(Net* pNet, Cell* pCell);
+        int   T(Net* pNet, Cell* pCell);
         
-        // main functions
+        // workflow
         void Parse_input(std::ifstream& input);
-        void Print_CutSize_Result();
         void Initialization();
         void Pass();
+
+        // display
+        void Print_CutSize_Result();
         void GetNetList();
         void GetCellList();
 };
