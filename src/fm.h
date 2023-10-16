@@ -13,18 +13,21 @@
 
 class FiducciaMattheyses_Heuristic{
     private:
-        double                          balance_factor;
-        double                          lower_bound, upper_bound;
+        // immutable
+        float                           balance_factor;
+        float                           lower_bound, upper_bound;
         std::string                     line, word;
         std::stringstream               ss;
         std::unordered_map<int, Cell*>  cell_list;
         std::unordered_map<int, Net*>   net_list;
         int                             n_id, c_id;
         int                             n_number, c_number;
-        int                             g1_size, g2_size;
         int                             max_pin;
+
+        // variable
+        int                             g1_size, g2_size;
         int                             cut_size;
-        BucketList                      bucket_list_g1, bucket_list_g2;
+        BucketList                      bucket_list;
 
     public:
         // constructor and destructor
@@ -43,16 +46,19 @@ class FiducciaMattheyses_Heuristic{
         int   getPinNum();
         int   F(Net* pNet, Cell* pCell);
         int   T(Net* pNet, Cell* pCell);
+        bool  MeetAreaCons(Cell* pCell);
+        void  UpdateCutSize(Cell* pCell);
+        void  UpdateGain(Cell* pCell);
         
         // workflow
-        void Parse_input(std::ifstream& input);
-        void Initialization();
-        void Pass();
+        void  Parse_input(std::ifstream& input);
+        void  Initialization();
+        int   Pass(int pass_num);
 
         // display
-        void Print_CutSize_Result();
-        void GetNetList();
-        void GetCellList();
+        void  Print_Result();
+        void  GetNetList();
+        void  GetCellList();
 };
 
 #endif

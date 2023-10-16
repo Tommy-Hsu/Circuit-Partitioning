@@ -33,7 +33,7 @@ class Cell
         bool GetIsLocked()                         { return is_locked_; };
         void SetGain(int gain)                     { gain_ = gain; };
         int  GetGain()                             { return gain_; };
-        std::unordered_map<int, Net*> GetNetList() { return net_list_; };
+        std::unordered_map<int, Net*>& GetNetList() { return net_list_; };
 };
 
 class Net
@@ -55,8 +55,22 @@ class Net
         void InsertCellList(Cell* pCell );
         int GetCellListSize()                        { return cell_list_.size(); };
         Cell* GetCell( int id )                      { return cell_list_[id]; };
-        std::unordered_map<int, Cell*> GetCellList() { return cell_list_; };
+        std::unordered_map<int, Cell*>& GetCellList() { return cell_list_; };
+        void SetG1Num(int g1_num)                    { g1_num_ = g1_num; };
+        int GetG1Num()                               { return g1_num_; };
+        void SetG2Num(int g2_num)                    { g2_num_ = g2_num; };
+        int GetG2Num()                               { return g2_num_; };
 };
+
+struct pass_result
+{
+    int iteration;
+    int cell_id;
+    int gain;
+    int cut_size;
+    int partial_sum_gains;
+};
+
 
 inline void Cell::InsertNetList(Net* pNet) {
     net_list_[pNet->GetNetID()] = pNet;

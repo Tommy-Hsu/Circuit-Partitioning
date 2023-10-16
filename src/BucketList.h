@@ -4,6 +4,7 @@
 #include <map>
 #include <list>
 #include <iostream>
+#include <algorithm>
 #include <unordered_map>
 #include "Data.h"
 
@@ -20,6 +21,9 @@ public:
 
     void remove(Cell* cell, int gain) {
         gainLists[gain].erase(cellPosition[cell]);
+        if (gainLists[gain].empty()) {
+            gainLists.erase(gain);
+        }
         cellPosition.erase(cell);
     }
 
@@ -33,16 +37,60 @@ public:
         return gainLists.rbegin()->second.back();
     }
 
-    void display() const {
-        std::cout << "Bucket List: " << std::endl;
+    Cell* getNextMaxGainCell(Cell* currentCell) {
+        if (!currentCell) return nullptr;
 
-        for (auto it = gainLists.rbegin(); it != gainLists.rend(); ++it) {
-            std::cout << "Gain: " << it->first << " -> ";
-            for (Cell* cell : it->second) {
-                std::cout << "Cell " << cell->GetCellID() << " -> ";
+        int currentGain = currentCell->GetGain();
+        auto currentGainListIt = gainLists.find(currentGain);
+        if (currentGainListIt == gainLists.end()) {
+            // This shouldn't happen; it means currentCell has a gain not present in the map.
+            return nullptr;
+        }
+
+        // Get iterator pointing to currentCell in the list.
+        auto currentCellIt = cellPosition[currentCell];
+
+        // Check if there's a next cell in the current gain list.
+        auto nextCellIt = std::next(currentCellIt);
+        if (nextCellIt != currentGainListIt->second.end()) {
+            return *nextCellIt;
+        }
+
+        // Move to the next gain in the map.
+        if (currentGainListIt != gainLists.begin()) {
+            --currentGainListIt;
+            return currentGainListIt->second.back();
+        }
+
+        // currentCell has the highest gain and is the last in its list.
+        return nullptr;
+    }
+
+    void display() const {
+
+        std::cout << " ============== G1 Bucket List ============== " << std::endl;
+        for(auto& pair : gainLists) {
+            std::cout << "Gain " << pair.first << ":";
+            for(auto& cell : pair.second) {
+                if(cell->GetIsInG1()){
+                    std::cout << " Cell " << cell->GetCellID() << "->";
+                }
             }
             std::cout << std::endl;
         }
+
+        std::endl(std::cout);
+        std::cout << " ============== G2 Bucket List ============== " << std::endl;
+        for(auto& pair : gainLists) {
+            std::cout << "Gain " << pair.first << ":";
+            for(auto& cell : pair.second) {
+                if(!cell->GetIsInG1()){
+                    std::cout << " Cell " << cell->GetCellID() << " ->";
+                }
+            }
+            std::cout << std::endl;
+        }
+        std::endl(std::cout);
     }
 };
 
