@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include "Data.h"
+#include "Debug.h"
 
 class BucketList {
 private:
@@ -67,30 +68,30 @@ public:
     }
 
     void display() const {
+        const int columnWidth = 30; // 调整列宽度以适应您的需求
+        const int gainWidth = 8;   // 调整增益列宽度以适应您的需求
 
-        std::cout << " ============== G1 Bucket List ============== " << std::endl;
+        DEBUG_COUT(std::left << std::setw(columnWidth) << "-------------" << std::left << std::setw(columnWidth) << "-------------" << std::endl);
+        DEBUG_COUT(std::left << std::setw(columnWidth) << "G1 Bucket List" << std::left << std::setw(columnWidth) << "G2 Bucket List" << std::endl);
+        DEBUG_COUT(std::left << std::setw(columnWidth) << "-------------" << std::left << std::setw(columnWidth) << "-------------" << std::endl);
+
         for(auto& pair : gainLists) {
-            std::cout << "Gain " << pair.first << ":";
+            std::stringstream g1_stream, g2_stream;
+
+            g1_stream << "Gain " << std::setw(gainWidth) << pair.first << ": ";
+            g2_stream << "Gain " << std::setw(gainWidth) << pair.first << ": ";
+
             for(auto& cell : pair.second) {
                 if(cell->GetIsInG1()){
-                    std::cout << " Cell " << cell->GetCellID() << "->";
+                    g1_stream << "Cell " << cell->GetCellID() << "-> ";
+                } else {
+                    g2_stream << "Cell " << cell->GetCellID() << "-> ";
                 }
             }
-            std::cout << std::endl;
-        }
 
-        std::endl(std::cout);
-        std::cout << " ============== G2 Bucket List ============== " << std::endl;
-        for(auto& pair : gainLists) {
-            std::cout << "Gain " << pair.first << ":";
-            for(auto& cell : pair.second) {
-                if(!cell->GetIsInG1()){
-                    std::cout << " Cell " << cell->GetCellID() << " ->";
-                }
-            }
-            std::cout << std::endl;
+            DEBUG_COUT(std::left << std::setw(columnWidth) << g1_stream.str() << std::left << std::setw(columnWidth) << g2_stream.str() << std::endl);
         }
-        std::endl(std::cout);
+        DEBUG_COUT(std::endl);
     }
 };
 

@@ -18,17 +18,6 @@ Cell* FiducciaMattheyses_Heuristic::getOrCreateCell(int c_id) {
     return newCell;
 }
 
-int FiducciaMattheyses_Heuristic::getPinNum(){
-
-    int mp = 0;
-    for(const auto& pair : cell_list){
-        if((pair.second)->GetNetListSize() > mp){
-            mp = (pair.second)->GetNetListSize();
-        }
-    }
-    return mp;
-}
-
 int FiducciaMattheyses_Heuristic::F(Net* pNet, Cell* pCell){
 
     int fn = 0;
@@ -174,6 +163,42 @@ void FiducciaMattheyses_Heuristic::UpdateGain(Cell* pCell){
     }
 }
 
+void FiducciaMattheyses_Heuristic::MoveBack(int max_partial_sum_gain){
+
+    // unlock all cells
+    for(int i = 1; i <= c_number; i++){
+        cell_list[i]->SetIsLocked(false);
+        cell_list[i]->SetGain(0);
+    }
+
+    // find the best iterator and move back some cells
+    for(int i = c_number; i >= 1; i--){
+        if(pass_result[i-1]->partial_sum_gain_ == max_partial_sum_gain){
+            break;
+        }
+        else{
+            Cell* pCell = cell_list[pass_result[i-1]->cell_id_];
+            UpdateCutSize(pCell);
+            g1_size = g1_size - pCell->GetIsInG1() + !(pCell->GetIsInG1());
+            g2_size = g2_size - !(pCell->GetIsInG1()) + pCell->GetIsInG1();
+            pCell->SetIsInG1(!(pCell->GetIsInG1()));
+        }
+    }
+
+    // reconstruct bucket list and update gain
+    for(int i = 1; i <= c_number; i++){
+        for(const auto& pair : cell_list[i]->GetNetList()){
+            if(F(pair.second, cell_list[i]) == 1){
+                cell_list[i]->SetGain( cell_list[i]->GetGain() + 1);
+            }
+            if(T(pair.second, cell_list[i]) == 0){
+                cell_list[i]->SetGain( cell_list[i]->GetGain() - 1);
+            }
+        }
+        bucket_list.insert(cell_list[i], cell_list[i]->GetGain());
+    }
+}
+
 // workflow
 void FiducciaMattheyses_Heuristic::Parse_input(std::ifstream& input){
 
@@ -205,14 +230,14 @@ void FiducciaMattheyses_Heuristic::Parse_input(std::ifstream& input){
 
 void FiducciaMattheyses_Heuristic::Initialization(){
 
+    DEBUG_COUT(std::endl);
     lower_bound = float((float)(c_number * 0.5) - (int)(balance_factor * c_number * 0.5));
-    std::cout << "lower_bound = " << lower_bound << std::endl;
+    DEBUG_COUT("lower_bound = " << lower_bound);
     upper_bound = float((float)(c_number * 0.5) + (int)(balance_factor * c_number * 0.5));
-    std::cout << "upper_bound = " << upper_bound << std::endl;
+    DEBUG_COUT(", upper_bound = " << upper_bound << std::endl);
     g1_size = 0;
     g2_size = 0;
     cut_size = 0;
-    max_pin = getPinNum();
 
     // put cells into G1 and G2
     for(int i = 1; i <= c_number; i++){
@@ -263,12 +288,11 @@ void FiducciaMattheyses_Heuristic::Initialization(){
     for(int i = 1; i <= c_number; i++){
         bucket_list.insert(cell_list[i], cell_list[i]->GetGain());
     }
-
-    std::cout << " ============== Initialization ============== " << std::endl;
+                 
+    DEBUG_COUT(" ************** Initialization ************** " << std::endl);
+    DEBUG_COUT("G1 size = " << g1_size << ", G2 size = " << g2_size << std::endl);
+    DEBUG_COUT("Cutsize = " << cut_size << std::endl);
     bucket_list.display();
-    std::cout << "G1 size = " << g1_size << ", G2 size = " << g2_size << std::endl;
-    std::cout << "Cutsize = " << cut_size << std::endl;
-    std::endl(std::cout);
 }
 
 int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
@@ -276,23 +300,25 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
     int maximum_partial_sum_Gk = 0;
     int partial_sum_Gk = 0;
     Cell* pCell;
-
-    std::cout << " ============== Pass " << pass_cnt << " ============== " << std::endl;
+                   
+    DEBUG_COUT(" -------------- Pass " << pass_cnt << " -------------- " << std::endl;)
 
     for(int i = 1; i <= c_number; i++){
 
+        One_move_result* result = new One_move_result();
         /*
             Choose a vertex V such that gain is largest 
             and moving V will not violate the area constraint
             and V is not locked
         */
         pCell = bucket_list.getMaxGainCell();
-        std::cout << "someome is chosen" << std::endl;
-        std::cout << "Cell " << pCell->GetCellID() << " is chosened" << std::endl;
+        DEBUG_COUT (" ++++++++++++++ iteration " << i << " ++++++++++++++ " << std::endl);
+        DEBUG_COUT ("someome is chosen" << std::endl);
+        DEBUG_COUT ("Cell " << pCell->GetCellID() << " is chosened" << std::endl);
         while( !(MeetAreaCons(pCell)) ){
             pCell = bucket_list.getNextMaxGainCell(pCell);
-            std::cout << "someome is chosen" << std::endl;
-            std::cout << "Cell " << pCell->GetCellID() << " is chosened" << std::endl;
+            DEBUG_COUT("someome is chosen" << std::endl;)
+            DEBUG_COUT("Cell " << pCell->GetCellID() << " is chosened" << std::endl;)
         }
 
         pCell->SetIsLocked(true);
@@ -309,54 +335,99 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
 
         bucket_list.remove(pCell, pCell->GetGain());
 
-        // display
-        std::cout << " ============== iteration " << i << " ============== " << std::endl;
+        // display     
         bucket_list.display();
-        std::cout << "G1 size = " << g1_size << ", G2 size = " << g2_size << std::endl;
-        std::cout << "Cell " << pCell->GetCellID() << " is moved, " << "Gain = " << pCell->GetGain() << std::endl;
-        std::cout << "partial_sum_Gk = " << partial_sum_Gk << std::endl;
-        std::cout << "UpdateCutSize to " << cut_size <<  std::endl;
-
-        std::endl(std::cout);
+        result->cell_id_ = pCell->GetCellID();
+        result->cutsize_ = cut_size;
+        result->gain_ = pCell->GetGain();
+        result->partial_sum_gain_ = partial_sum_Gk;
+        pass_result.push_back(result);
     }
+    GetPassResult();
 
+    // move back
+    MoveBack(maximum_partial_sum_Gk);
+
+    for(One_move_result* result : pass_result){
+        delete result;
+    }
+    pass_result.clear();
     return maximum_partial_sum_Gk;
 }
 
-// display
-void FiducciaMattheyses_Heuristic::Print_Result(){
-
-    std::cout << "Cutsize = " << cut_size << std::endl;
-    std::cout << "G1 " << g1_size << std::endl;
-    for(int i = 1; i <= c_number; i++){
-        if(cell_list[i]->GetIsInG1()){
-            std::cout << "c" << i << " ";
+void FiducciaMattheyses_Heuristic::Print_Result(std::ofstream& output) {
+    output << "Cutsize = " << cut_size << std::endl;
+    output << "G1 " << g1_size << std::endl;
+    for (int i = 1; i <= c_number; i++) {
+        if (cell_list[i]->GetIsInG1()) {
+            output << "c" << i << " ";
         }
     }
-    std::cout << ";" << std::endl;
-    std::cout << "G2 " << g2_size << std::endl;
-    for(int i = 1; i <= c_number; i++){
-        if(!cell_list[i]->GetIsInG1()){
-            std::cout << "c" << i << " ";
+    output << ";" << std::endl;
+    output << "G2 " << g2_size << std::endl;
+    for (int i = 1; i <= c_number; i++) {
+        if (!cell_list[i]->GetIsInG1()) {
+            output << "c" << i << " ";
         }
     }
-    std::cout << ";" << std::endl;
+    output << ";" << std::endl;
 
-    // temporary output
-    std::cout << "max_pin = " << max_pin << std::endl;
-
+    // 如果您还想在终端上看到输出，请使用 DEBUG_COUT
+    DEBUG_COUT("Cutsize = " << cut_size << std::endl);
+    DEBUG_COUT("G1 " << g1_size << std::endl);
+    for (int i = 1; i <= c_number; i++) {
+        if (cell_list[i]->GetIsInG1()) {
+            DEBUG_COUT("c" << i << " ");
+        }
+    }
+    DEBUG_COUT(";" << std::endl);
+    DEBUG_COUT("G2 " << g2_size << std::endl);
+    for (int i = 1; i <= c_number; i++) {
+        if (!cell_list[i]->GetIsInG1()) {
+            DEBUG_COUT("c" << i << " ");
+        }
+    }
+    DEBUG_COUT(";" << std::endl);
 }
 
-void FiducciaMattheyses_Heuristic::GetNetList(){
+void FiducciaMattheyses_Heuristic::Get_Cell_and_Net_List(){
 
     for (const auto& pair : net_list) {
-        std::cout << "Net: " << pair.first << ", Cells: " << (pair.second)->GetCellListSize() << std::endl;
+        DEBUG_COUT("Net " << pair.first << " :");
+        for (const auto& pair2 : (pair.second)->GetCellList()) {
+            DEBUG_COUT(" Cell " << (pair2.second)->GetCellID() << " -> ");
+        }
+        DEBUG_COUT(std::endl);
+    }
+    DEBUG_COUT(std::endl);
+    for (const auto& pair : cell_list) {
+        DEBUG_COUT("Cell " << pair.first << " :");
+        for (const auto& pair2 : (pair.second)->GetNetList()) {
+            DEBUG_COUT(" Net " << (pair2.second)->GetNetID() << " -> ");
+        }
+        DEBUG_COUT(std::endl);
     }
 }
 
-void FiducciaMattheyses_Heuristic::GetCellList(){
+void FiducciaMattheyses_Heuristic::GetPassResult(){
+    
+    DEBUG_COUT("|" << std::setw(5) << " i" 
+            << "|" << std::setw(10) << " cell" 
+            << "|" << std::setw(10) << " g(i)" 
+            << "|" << std::setw(11) << " Σg(i)" 
+            << "|" << std::setw(11) << " cutsize |" << std::endl);
+    DEBUG_COUT("|" << std::setw(5) << "----"
+            << "|" << std::setw(10) << "----------" 
+            << "|" << std::setw(10) << "----------" 
+            << "|" << std::setw(10) << "----------" 
+            << "|" << std::setw(10) << "----------|" << std::endl);
 
-    for (const auto& pair : cell_list) {
-        std::cout << "Cell: " << pair.first << ", Nets: " << (pair.second)->GetNetListSize() << std::endl;
+    for(int i = 1; i <= c_number; i++){
+        DEBUG_COUT("|" << std::setw(5) << i 
+                << "|" << std::setw(10) << pass_result[i-1]->cell_id_ 
+                << "|" << std::setw(10) << pass_result[i-1]->gain_ 
+                << "|" << std::setw(10) << pass_result[i-1]->partial_sum_gain_ 
+                << "|" << std::setw(10) << pass_result[i-1]->cutsize_ << "|" << std::endl);
     }
+    DEBUG_COUT(std::endl);
 }

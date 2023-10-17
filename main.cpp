@@ -21,14 +21,13 @@ int main(int argc, char* argv[]){
     start = clock();
 
     fm.Parse_input(input);
-    // fm.GetNetList();
-    // fm.GetCellList();
+    fm.Get_Cell_and_Net_List();
     fm.Initialization();
     while(G){
         G = fm.Pass(pass_cnt);
         pass_cnt++;
     }
-    // fm.Print_CutSize_Result();
+    fm.Print_Result(output);
 
     end = clock();
     cout << "CPU time: " << fixed << setprecision(5) 
