@@ -15,11 +15,16 @@ class Cell
         int                           gain_;
         std::unordered_map<int, Net*> net_list_;
         bool                          is_in_g1_;
+        Cell*                         next_cell_;
+        Cell*                         prev_cell_;
+
     public:
         Cell(int id){ 
             id_ = id; 
             is_locked_ = false;
             gain_ = 0;
+            next_cell_ = nullptr;
+            prev_cell_ = nullptr;
         };
         ~Cell(){};
 
@@ -34,6 +39,10 @@ class Cell
         void SetGain(int gain)                     { gain_ = gain; };
         int  GetGain()                             { return gain_; };
         std::unordered_map<int, Net*>& GetNetList() { return net_list_; };
+        void SetNextCell(Cell* next_cell)          { next_cell_ = next_cell; };
+        Cell* GetNextCell()                        { return next_cell_; };
+        void SetPrevCell(Cell* prev_cell)          { prev_cell_ = prev_cell; };
+        Cell* GetPrevCell()                        { return prev_cell_; };
 };
 
 class Net

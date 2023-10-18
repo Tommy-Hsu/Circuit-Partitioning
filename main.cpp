@@ -21,13 +21,16 @@ int main(int argc, char* argv[]){
     start = clock();
 
     fm.Parse_input(input);
-    fm.Get_Cell_and_Net_List();
+    std::cout << "Parsing input done." << std::endl;
+    // fm.Get_Cell_and_Net_List();
     fm.Initialization();
+    std::cout << "Initialization done." << std::endl;
     while(G){
         G = fm.Pass(pass_cnt);
-        pass_cnt++;
+        std::cout << "Pass " << pass_cnt++ << " done." << std::endl;
     }
     fm.Print_Result(output);
+    std::cout << "Print result done." << std::endl;
 
     end = clock();
     cout << "CPU time: " << fixed << setprecision(5) 

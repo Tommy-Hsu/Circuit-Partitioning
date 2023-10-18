@@ -57,7 +57,6 @@ class FiducciaMattheyses_Heuristic{
 
         // functions
         Cell* getOrCreateCell(int c_id);
-        int   getPinNum();
         int   F(Net* pNet, Cell* pCell);
         int   T(Net* pNet, Cell* pCell);
         bool  MeetAreaCons(Cell* pCell);
@@ -74,6 +73,7 @@ class FiducciaMattheyses_Heuristic{
         void  Print_Result(std::ofstream& output);
         void  Get_Cell_and_Net_List();
         void  GetPassResult();
+        void  GetCellptr();
 };
 
 #endif

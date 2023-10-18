@@ -13,3 +13,5 @@ Lab1
 *.out
 
 *.o
+
+input*/
