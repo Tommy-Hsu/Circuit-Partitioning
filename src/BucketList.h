@@ -70,8 +70,9 @@ public:
         
         if(currentCell->GetPrevCell() == nullptr){
             int currentGain = currentCell->GetGain();
+            currentGain--;
             // to next gain
-            while(gainSet.find(currentGain) != gainSet.begin()){
+            while(gainSet.count(currentGain) == 0){
                 currentGain--;
             }
             return gainLists[currentGain]->back();

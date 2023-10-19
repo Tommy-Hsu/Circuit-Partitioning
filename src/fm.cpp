@@ -316,11 +316,13 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
         pCell = bucket_list.getMaxGainCell();
         // DEBUG_COUT (" ++++++++++++++ iteration " << i << " ++++++++++++++ " << std::endl);
         // DEBUG_COUT ("someome is chosen" << std::endl);
-        // DEBUG_COUT ("Cell " << pCell->GetCellID() << " is chosened" << std::endl);
+        // DEBUG_COUT ("Cell " <<。 pCell->GetCellID() << " is chosened" << std::endl);
+        // DEBUG_COUT ("Gain = " << pCell->GetGain() << std::endl);
         while( !(MeetAreaCons(pCell)) ){
             pCell = bucket_list.getNextCell(pCell);
             // DEBUG_COUT("someome is chosen" << std::endl;)
             // DEBUG_COUT("Cell " << pCell->GetCellID() << " is chosened" << std::endl;)
+            // DEBUG_COUT("Gain = " << pCell->GetGain() << std::endl;)
         }
 
         pCell->SetIsLocked(true);
@@ -339,7 +341,7 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
         bucket_list.remove(pCell, pCell->GetGain());
 
         // display     
-        // bucket_list.display();
+        // bucket_list.display_detail();
         // GetCellptr();
         result->cell_id_ = pCell->GetCellID();
         result->cutsize_ = cut_size;
@@ -347,7 +349,7 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
         result->partial_sum_gain_ = partial_sum_Gk;
         pass_result.push_back(result);
     }
-    GetPassResult();
+    // GetPassResult();
 
     // move back
     MoveBack(maximum_partial_sum_Gk);
