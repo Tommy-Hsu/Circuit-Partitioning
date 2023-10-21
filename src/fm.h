@@ -15,10 +15,10 @@
 
 struct One_move_result
 {
-    int cell_id_;          // cell character
-    int gain_;        // g(i) value
-    int partial_sum_gain_;   // Σ g(i) value
-    int cutsize_;        // cutsize value
+    int cell_id_;         
+    int gain_;       
+    int partial_sum_gain_;  
+    int cutsize_;        
 };
 
 

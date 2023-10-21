@@ -12,9 +12,9 @@
 
 class BucketList {
 private:
-    int maxGain = 0;
-    std::set<int> gainSet; // Stores the set of all gains.
-    std::unordered_map<int, std::list<Cell*>*> gainLists; // Mapping from gain to list of cells with that gain.
+    int                                                   maxGain = 0;
+    std::set<int>                                         gainSet;      // Stores the set of all gains.
+    std::unordered_map<int, std::list<Cell*>*>            gainLists;    // Mapping from gain to list of cells with that gain.
     std::unordered_map<Cell*, std::list<Cell*>::iterator> cellPosition; // Stores the iterator pointing to the cell's position in its gain list.
 
 public:
@@ -62,7 +62,6 @@ public:
     }
 
     Cell* getMaxGainCell() {
-        // Assuming the map and lists are non-empty. Add appropriate checks if necessary.
         return gainLists[maxGain]->back();
     }
 
@@ -81,8 +80,8 @@ public:
     }
 
     void display_detail() const {
-        const int columnWidth = 30; // 调整列宽度以适应您的需求
-        const int gainWidth = 8;   // 调整增益列宽度以适应您的需求
+        const int columnWidth = 30;
+        const int gainWidth   = 8;  
 
         DEBUG_COUT(std::left << std::setw(columnWidth) << "-------------" << std::left << std::setw(columnWidth) << "-------------" << std::endl);
         DEBUG_COUT(std::left << std::setw(columnWidth) << "G1 Bucket List" << std::left << std::setw(columnWidth) << "G2 Bucket List" << std::endl);
@@ -108,8 +107,8 @@ public:
     }
 
     void display() const {
-                const int columnWidth = 30; // 调整列宽度以适应您的需求
-        const int gainWidth = 8;   // 调整增益列宽度以适应您的需求
+        const int columnWidth = 30; 
+        const int gainWidth   = 8;
 
         DEBUG_COUT(std::left << std::setw(columnWidth) << "-------------" << std::left << std::setw(columnWidth) << "-------------" << std::endl);
         DEBUG_COUT(std::left << std::setw(columnWidth) << "G1 Bucket List" << std::left << std::setw(columnWidth) << "G2 Bucket List" << std::endl);

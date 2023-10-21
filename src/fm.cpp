@@ -293,8 +293,8 @@ void FiducciaMattheyses_Heuristic::Initialization(){
     DEBUG_COUT(" ************** Initialization ************** " << std::endl);
     DEBUG_COUT("G1 size = " << g1_size << ", G2 size = " << g2_size << std::endl);
     DEBUG_COUT("Cutsize = " << cut_size << std::endl);
-    // bucket_list.display();
-    // GetCellptr();
+    bucket_list.display_detail();
+    GetCellptr();
 }
 
 int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
@@ -303,7 +303,7 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
     int partial_sum_Gk = 0;
     Cell* pCell;
                    
-    DEBUG_COUT(" -------------- Pass " << pass_cnt << " -------------- " << std::endl;)
+    std::cout << " -------------- Pass " << pass_cnt << " -------------- " << std::endl;
 
     for(int i = 1; i <= c_number; i++){
 
@@ -316,7 +316,7 @@ int FiducciaMattheyses_Heuristic::Pass(int pass_cnt){
         pCell = bucket_list.getMaxGainCell();
         // DEBUG_COUT (" ++++++++++++++ iteration " << i << " ++++++++++++++ " << std::endl);
         // DEBUG_COUT ("someome is chosen" << std::endl);
-        // DEBUG_COUT ("Cell " <<。 pCell->GetCellID() << " is chosened" << std::endl);
+        // DEBUG_COUT ("Cell " << pCell->GetCellID() << " is chosened" << std::endl);
         // DEBUG_COUT ("Gain = " << pCell->GetGain() << std::endl);
         while( !(MeetAreaCons(pCell)) ){
             pCell = bucket_list.getNextCell(pCell);
@@ -380,16 +380,15 @@ void FiducciaMattheyses_Heuristic::Print_Result(std::ofstream& output) {
     }
     output << ";" << std::endl;
 
-    // 如果您还想在终端上看到输出，请使用 DEBUG_COUT
-    DEBUG_COUT("Cutsize = " << cut_size << std::endl);
-    DEBUG_COUT("G1 " << g1_size << std::endl);
+    std::cout << "Cutsize = " << cut_size << std::endl;
+    std::cout << "G1 " << g1_size << std::endl;
     for (int i = 1; i <= c_number; i++) {
         if (cell_list[i]->GetIsInG1()) {
             DEBUG_COUT("c" << i << " ");
         }
     }
     DEBUG_COUT(";" << std::endl);
-    DEBUG_COUT("G2 " << g2_size << std::endl);
+    std::cout << "G2 " << g2_size << std::endl;
     for (int i = 1; i <= c_number; i++) {
         if (!cell_list[i]->GetIsInG1()) {
             DEBUG_COUT("c" << i << " ");

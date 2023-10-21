@@ -1,25 +1,22 @@
-# Compiler to use
 CXX = g++
 
-# Compiler flags
-CXXFLAGS = -Wall -std=c++11 -g
+CXXFLAGS = -std=c++11 -g
 
-# Name of the target executable
+OPTFLAGS = -O3 -pthread
+
 TARGET = Lab1
 
 OBJS = main.o fm.o
 
 all: $(TARGET) release
 
-# Debug target
-debug: CXXFLAGS += -DDEBUG_FLAG=1
+debug: CXXFLAGS += -Wall -DDEBUG_FLAG=1
 debug: $(TARGET)
 	./$(TARGET) SolutionChecker/sample.in output_debug.out
 
-# Release target
-release: CXXFLAGS += -DDEBUG_FLAG=0
+release: CXXFLAGS += -DDEBUG_FLAG=0 $(OPTFLAGS)
 release: $(TARGET)
-	./$(TARGET) SolutionChecker/sample.in output_release.out
+	./$(TARGET) SolutionChecker/case4.in output_release.out
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
